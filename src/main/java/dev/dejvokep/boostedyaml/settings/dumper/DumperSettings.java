@@ -81,6 +81,8 @@ public class DumperSettings implements Settings {
     private final ScalarStyle stringStyle;
     //If to preserve original scalar styles as loaded from the file
     private final boolean preserveScalarStyle;
+    //If to preserve original flow styles as loaded from the file
+    private final boolean preserveFlowStyle;
     //Formatters
     private final Formatter<ScalarStyle, String> scalarFormatter;
     private final Formatter<FlowStyle, Iterable<?>> sequenceFormatter;
@@ -99,6 +101,7 @@ public class DumperSettings implements Settings {
         this.mappingFormatter = builder.mappingFormatter;
         this.stringStyle = builder.stringStyle;
         this.preserveScalarStyle = builder.preserveScalarStyle;
+        this.preserveFlowStyle = builder.preserveFlowStyle;
     }
 
     /**
@@ -136,6 +139,16 @@ public class DumperSettings implements Settings {
      */
     public boolean isPreserveScalarStyle() {
         return preserveScalarStyle;
+    }
+
+    /**
+     * Returns whether original flow styles (as loaded from the file) are preserved and passed to the sequence and
+     * mapping formatters as the default style, instead of the configured flow style.
+     *
+     * @return if to preserve original flow styles
+     */
+    public boolean isPreserveFlowStyle() {
+        return preserveFlowStyle;
     }
 
     /**
@@ -230,6 +243,10 @@ public class DumperSettings implements Settings {
          */
         public static final boolean DEFAULT_PRESERVE_SCALAR_STYLE = false;
         /**
+         * If to preserve original flow styles by default.
+         */
+        public static final boolean DEFAULT_PRESERVE_FLOW_STYLE = false;
+        /**
          * If to add document start by default.
          */
         public static final boolean DEFAULT_START_MARKER = false;
@@ -286,6 +303,8 @@ public class DumperSettings implements Settings {
         private ScalarStyle stringStyle = DEFAULT_STRING_STYLE;
         //If to preserve original scalar styles
         private boolean preserveScalarStyle = DEFAULT_PRESERVE_SCALAR_STYLE;
+        //If to preserve original flow styles
+        private boolean preserveFlowStyle = DEFAULT_PRESERVE_FLOW_STYLE;
 
         /**
          * Creates a new builder from the given, already created SnakeYAML Engine settings builder.
@@ -439,6 +458,30 @@ public class DumperSettings implements Settings {
          */
         public Builder setPreserveScalarStyle(boolean preserve) {
             this.preserveScalarStyle = preserve;
+            return this;
+        }
+
+        /**
+         * Sets whether to preserve the original flow styles, exactly as they were loaded from the file.
+         * <p>
+         * When enabled, the flow style a sequence or mapping node was loaded with is passed to the respective
+         * {@link #setSequenceFormatter(Formatter) sequence} or {@link #setMappingFormatter(Formatter) mapping} formatter
+         * as the <i>default</i> style (the last parameter), instead of the configured {@link #setFlowStyle(FlowStyle)
+         * flow} style. The formatter still has the final say and may override it. Using the default (identity) formatter
+         * therefore reproduces the original styling.
+         * <p>
+         * This only affects collections that were actually loaded from a file. Values created or modified
+         * programmatically, as well as collections nested within another collection's value, have no original style and
+         * fall back to the configured flow style. Styles returned might still be overridden to produce output compliant
+         * with the YAML specification.
+         * <p>
+         * <b>Default: </b> {@link #DEFAULT_PRESERVE_FLOW_STYLE}
+         *
+         * @param preserve if to preserve original flow styles
+         * @return the builder
+         */
+        public Builder setPreserveFlowStyle(boolean preserve) {
+            this.preserveFlowStyle = preserve;
             return this;
         }
 
